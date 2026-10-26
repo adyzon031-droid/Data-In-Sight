@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fixture local · Editor enriquecido</title>
+    <style>
+      body {
+        font: 16px system-ui;
+        max-width: 800px;
+        margin: 36px auto;
+        background: #eef6f4;
+        color: #10232b;
+        padding: 20px;
+      }
+      .editor {
+        white-space: pre-wrap;
+        min-height: 150px;
+        border: 1px solid #bed3cb;
+        padding: 20px;
+        background: white;
+      }
+      button {
+        padding: 12px;
+        margin: 12px 6px;
+      }
+      form,
+      .text-input-field {
+        border: 1px solid #bed3cb;
+        border-radius: 16px;
+        padding: 20px;
+      }
+      p {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simulación local · <span id="platform"></span></h1>
+    <p>
+      Fixture controlado. No es el sitio real y no envía datos al proveedor.
+    </p>
+    <div id="mount"></div>
+    <button id="replace">Cambiar conversación</button
+    ><button id="unsupported">Editor incompatible</button
+    ><button id="stop">Simular generación</button
+    ><small id="count">0 envíos</small>
+    <script>
+      const platform = location.hostname === "claude.ai" ? "claude" : "gemini";
+      document.querySelector("#platform").textContent = platform;
+      let count = 0;
+      function render() {
+        document.querySelector("#mount").innerHTML =
+          platform === "claude"
+            ? '<form><div class="editor ProseMirror" contenteditable="true" role="textbox" aria-label="Mensaje de prueba"><p><br></p></div><button type="submit" aria-label="Send message" disabled><span>Enviar mensaje</span></button></form>'
+            : '<div class="text-input-field"><rich-textarea><div class="editor ql-editor" contenteditable="true" role="textbox" aria-label="Mensaje de prueba"><p><br></p></div><div class="ql-clipboard" contenteditable="true" hidden></div></rich-textarea><button type="button" aria-label="Enviar mensaje" disabled><span>Enviar mensaje</span></button></div>';
+        const editor = document.querySelector('[role="textbox"]'),
+          scope = editor.closest("form, .text-input-field"),
+          button = scope.querySelector("button");
+        // Separate model: a DOM-only textContent change must not be sufficient to update what is sent.
+        let model = "",
+          composing = false;
+        editor.addEventListener("input", () => {
+          model = editor.innerText;
+          button.disabled = !model.trim();
+        });
+        editor.addEventListener("compositionstart", () => (composing = true));
+        editor.addEventListener("compositionend", () => (composing = false));
+        editor.addEventListener("keydown", (event) => {
+          if (
+            event.key === "Enter" &&
+            !event.shiftKey &&
+            !event.isComposing &&
+            !composing
+          ) {
+            event.preventDefault();
+            button.click();
+          }
+        });
+        function send(event) {
+          event.preventDefault();
+          if (button.dataset.stopping) {
+            document.body.dataset.stopClicked = "true";
+            return;
+          }
+          count++;
+          document.querySelector("#count").textContent = count + " envíos";
+          fetch("/fixture-submit", { method: "POST", body: model });
+        }
+        if (platform === "claude") scope.addEventListener("submit", send);
+        else button.addEventListener("click", send);
+      }
+      render();
+      document.querySelector("#replace").onclick = () => {
+        history.pushState(
+          {},
+          "",
+          platform === "claude"
+            ? "/chat/fixture-" + Date.now()
+            : "/app/fixture-" + Date.now(),
+        );
+        render();
+      };
+      document.querySelector("#unsupported").onclick = () =>
+        (document.querySelector('[role="textbox"]').className =
+          "unknown-editor");
+      document.querySelector("#stop").onclick = () => {
+        const b = document.querySelector("#mount button");
+        b.dataset.stopping = "true";
+        b.setAttribute("aria-label", "Stop response");
+        b.type = "button";
+        b.disabled = false;
+        b.onclick = () => (document.body.dataset.stopClicked = "true");
+      };
+    </script>
+  </body>
+</html>

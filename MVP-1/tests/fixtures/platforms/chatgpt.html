@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fixture local · Editor ChatGPT</title>
+    <style>
+      body {
+        font: 16px system-ui;
+        background: #eef6f4;
+        color: #10232b;
+        margin: 40px auto;
+        max-width: 800px;
+        padding: 20px;
+      }
+      textarea {
+        width: 100%;
+        min-height: 140px;
+        padding: 18px;
+        font: 16px/1.6 system-ui;
+      }
+      button {
+        padding: 12px 16px;
+        margin: 10px 8px 10px 0;
+      }
+      form {
+        background: white;
+        padding: 24px;
+        border: 1px solid #c6d8d0;
+        border-radius: 20px;
+      }
+      small {
+        color: #597269;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simulación local de envío</h1>
+    <p>Fixture controlado. No es ChatGPT y no envía datos a OpenAI.</p>
+    <div id="mount"></div>
+    <button id="replace">Cambiar conversación</button
+    ><button id="unsupported">Cambiar a editor incompatible</button
+    ><small id="count">0 envíos</small>
+    <script>
+      let counter = 0;
+      function render() {
+        document.getElementById("mount").innerHTML =
+          '<form data-mobile-composer action="/fixture-submit" method="post"><label for="mobile-composer-prompt">Mensaje de prueba</label><textarea id="mobile-composer-prompt" aria-label="Mensaje de prueba"></textarea><button data-composer-submit type="submit" aria-label="Enviar mensaje" disabled>Enviar mensaje</button></form>';
+        const editor = document.getElementById("mobile-composer-prompt"),
+          form = editor.form,
+          button = form.querySelector("[data-composer-submit]");
+        let composing = false;
+        editor.addEventListener("input", () => {
+          button.disabled = !editor.value.trim();
+          button.setAttribute("aria-disabled", String(button.disabled));
+        });
+        editor.addEventListener("compositionstart", () => (composing = true));
+        editor.addEventListener("compositionend", () => (composing = false));
+        editor.addEventListener("keydown", (event) => {
+          if (
+            event.key === "Enter" &&
+            !event.shiftKey &&
+            !event.isComposing &&
+            !composing
+          ) {
+            event.preventDefault();
+            button.click();
+          }
+        });
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          counter++;
+          document.getElementById("count").textContent = counter + " envíos";
+          fetch("/fixture-submit", { method: "POST", body: editor.value });
+        });
+      }
+      render();
+      document.getElementById("replace").onclick = () => {
+        history.pushState({}, "", "/c/fixture-" + Date.now());
+        render();
+      };
+      document.getElementById("unsupported").onclick = () => {
+        document.getElementById("mobile-composer-prompt").id = "unknown-editor";
+      };
+    </script>
+  </body>
+</html>
