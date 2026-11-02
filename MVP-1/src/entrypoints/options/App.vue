@@ -188,6 +188,7 @@ onMounted(state.load);
           :key="item.id"
           class="dis-nav-item"
           :class="{ selected: section === item.id }"
+          :data-section="item.id"
           type="button"
           :aria-current="section === item.id ? 'page' : undefined"
           @click="section = item.id"
@@ -548,39 +549,53 @@ onMounted(state.load);
           reducido del sistema.
         </p>
       </section>
-      <section v-else-if="section === 'demo'" class="dis-card">
-        <h2>Prueba el motor DLP</h2>
-        <p class="dis-muted">
-          Detecta → explica → sustituye → vuelve a evaluar.
-        </p>
+      <section
+        v-else-if="section === 'demo'"
+        aria-label="Demostración del motor DLP"
+      >
         <DemoLab v-if="!loading && !error" :settings="settings" />
       </section>
-      <section v-else class="dis-card">
-        <BrandLogo subtitle="Usa la IA con control sobre lo que compartes." />
-        <h2>La prevención empieza antes de enviar</h2>
-        <p class="dis-muted">
-          Data In Sight ayuda a reconocer datos personales y credenciales en
-          texto antes de compartirlos con herramientas de inteligencia
-          artificial.
-        </p>
-        <div class="dis-about-grid">
-          <div>
-            <AppIcon name="shield" />
-            <h3>Procesamiento local</h3>
-            <p>
-              Motor de reglas y validadores, sin servicios externos de análisis.
-            </p>
-          </div>
-          <div>
-            <AppIcon name="info" />
-            <h3>Límites transparentes</h3>
-            <p>
-              Las coincidencias no garantizan cobertura completa ni verifican
-              identidades.
-            </p>
+      <section v-else class="dis-card dis-about" aria-labelledby="about-title">
+        <div class="dis-about-identity">
+          <SecurityCore />
+          <h2>Data In Sight<span aria-hidden="true">.</span></h2>
+          <p>Usa la IA con control sobre<br />lo que compartes.</p>
+        </div>
+        <div class="dis-about-copy">
+          <h2 id="about-title">La prevención empieza antes de enviar.</h2>
+          <p class="dis-muted">
+            Data In Sight ayuda a reconocer datos personales y credenciales en
+            texto antes de compartirlos con herramientas de inteligencia
+            artificial.
+          </p>
+          <div class="dis-about-features">
+            <article class="dis-about-feature local">
+              <span class="dis-about-icon"
+                ><AppIcon name="settings" :size="30"
+              /></span>
+              <div>
+                <h3>Procesamiento local</h3>
+                <p>
+                  Motor de reglas y validadores, sin servicios externos de
+                  análisis.
+                </p>
+              </div>
+            </article>
+            <article class="dis-about-feature limits">
+              <span class="dis-about-icon"
+                ><AppIcon name="info" :size="30"
+              /></span>
+              <div>
+                <h3>Límites transparentes</h3>
+                <p>
+                  Las coincidencias no garantizan cobertura completa ni
+                  verifican identidades.
+                </p>
+              </div>
+            </article>
           </div>
         </div>
-        <p class="dis-inline-note">
+        <p class="dis-about-version dis-muted">
           Versión 0.1.0 · MVP en desarrollo. Demostración disponible; protección
           de envíos en preparación.
         </p>
@@ -589,3 +604,151 @@ onMounted(state.load);
     </main>
   </div>
 </template>
+
+<style scoped>
+.dis-about {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 30px;
+  padding: 36px 30px 24px;
+  border-color: color-mix(in srgb, var(--accent-cyan) 40%, var(--line));
+  background-image: radial-gradient(
+    ellipse at 15% 55%,
+    #10b98112,
+    transparent 65%
+  );
+}
+.dis-about-identity {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding-right: 24px;
+  border-right: 1px solid var(--line);
+}
+.dis-about-identity :deep(.dis-security-core) {
+  width: 100%;
+  max-width: 350px;
+  height: 250px;
+}
+.dis-about-identity :deep(.dis-core-caption) {
+  display: none;
+}
+.dis-about-identity h2 {
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin: 0 0 8px;
+}
+.dis-about-identity h2 span {
+  color: var(--emerald);
+}
+.dis-about-identity h2::before {
+  display: none;
+}
+.dis-about-identity p {
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0;
+}
+.dis-about-copy > h2 {
+  position: relative;
+  padding-left: 22px;
+  font-size: 25px;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+.dis-about-copy > h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 6px;
+  height: 34px;
+  border-radius: 5px;
+  background: linear-gradient(#38bdf8, #10b981);
+}
+.dis-about-copy > p {
+  font-size: 14px;
+  margin-bottom: 26px;
+}
+.dis-about-features {
+  display: grid;
+  gap: 14px;
+}
+.dis-about-feature {
+  --feature-accent: var(--accent-iris);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 16px;
+  border: 1px solid color-mix(in srgb, var(--feature-accent) 45%, var(--line));
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--feature-accent) 6%, transparent);
+}
+.dis-about-feature.limits {
+  --feature-accent: var(--accent-gold);
+}
+.dis-about-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border: 1px solid color-mix(in srgb, var(--feature-accent) 50%, transparent);
+  border-radius: 50%;
+  color: var(--feature-accent);
+  background: color-mix(in srgb, var(--feature-accent) 12%, transparent);
+}
+.dis-about-feature > div {
+  border-left: 1px solid var(--feature-accent);
+  padding-left: 18px;
+}
+.dis-about-feature h3 {
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+.dis-about-feature p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+.dis-about-version {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+}
+@media (max-width: 1000px) {
+  .dis-about {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 24px;
+  }
+  .dis-about-identity {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 0 0 24px;
+  }
+  .dis-about-identity :deep(.dis-security-core) {
+    height: 210px;
+  }
+}
+@media (max-width: 420px) {
+  .dis-about {
+    padding: 20px 16px;
+  }
+  .dis-about-feature {
+    gap: 12px;
+    padding: 16px 12px;
+  }
+  .dis-about-icon {
+    width: 44px;
+    height: 44px;
+  }
+  .dis-about-feature > div {
+    padding-left: 12px;
+  }
+}
+</style>

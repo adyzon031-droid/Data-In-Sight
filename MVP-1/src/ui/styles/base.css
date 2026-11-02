@@ -1280,7 +1280,7 @@ select:disabled {
   border-top: 1px solid #6ee7b71c;
   margin-top: auto;
   padding: 25px 10px 0;
-  color: #8caf9c;
+  color: #ffffff;
   font-size: 11px;
 }
 .dis-options {
@@ -1920,9 +1920,7 @@ select:disabled {
     radial-gradient(ellipse at 25% 85%, #38bdf809, transparent 45%);
 }
 .dis-sidebar {
-  background:
-    radial-gradient(ellipse at 0 0, #15553c 0, transparent 55%),
-    linear-gradient(165deg, #0a2c27, #0a1b28);
+  background: linear-gradient(to top, #059669 0%, #0a2c27 42%, #0a1b28 65%);
 }
 .dis-nav-item {
   gap: 11px;
@@ -1965,11 +1963,42 @@ select:disabled {
 .dis-nav-icon[data-section="about"] {
   color: #95b9d6;
 }
+/* Each navigation selection follows its icon's established accent. */
+.dis-nav-item[data-section="general"] {
+  --nav-accent: #92bfff;
+}
+.dis-nav-item[data-section="detection"] {
+  --nav-accent: #8ae1b7;
+}
+.dis-nav-item[data-section="sites"] {
+  --nav-accent: #7ddced;
+}
+.dis-nav-item[data-section="privacy"] {
+  --nav-accent: #d1b7ff;
+}
+.dis-nav-item[data-section="appearance"] {
+  --nav-accent: #efbbd4;
+}
+.dis-nav-item[data-section="demo"] {
+  --nav-accent: #f0ce94;
+}
+.dis-nav-item[data-section="about"] {
+  --nav-accent: #95b9d6;
+}
 .dis-nav-item.selected {
-  background: linear-gradient(95deg, #1b4c43, #173740);
-  border-color: #79cfb82e;
-  box-shadow: inset 3px 0 0 #8ed9d0;
-  color: #e1f7ed;
+  background: linear-gradient(
+    95deg,
+    color-mix(in srgb, var(--nav-accent) 20%, #102b2b),
+    color-mix(in srgb, var(--nav-accent) 8%, #10232b)
+  );
+  border-color: color-mix(in srgb, var(--nav-accent) 40%, transparent);
+  box-shadow: inset 3px 0 0 var(--nav-accent);
+  color: #f3faf8;
+}
+.dis-nav-item.selected .dis-nav-icon {
+  color: var(--nav-accent);
+  background: color-mix(in srgb, var(--nav-accent) 18%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--nav-accent) 12%, transparent);
 }
 .dis-root .dis-page-header .dis-muted {
   font-size: 13px;

@@ -58,7 +58,9 @@ const active = computed(
       >
         <SecurityCore compact :tone="active ? 'safe' : 'neutral'" />
         <div>
-          <span class="dis-eyebrow">Estado de protección</span>
+          <span class="dis-eyebrow"
+            ><i aria-hidden="true"></i>Estado de protección</span
+          >
           <h1 id="protection-title">
             {{
               loading
@@ -73,12 +75,21 @@ const active = computed(
           <p>
             {{ tab.reason }}
           </p>
-          <span class="dis-status-indicator" :class="{ active }"
-            ><i></i
-            >{{
-              active ? "Control de envío disponible" : "Revisión no disponible"
-            }}</span
-          >
+          <span v-if="active" class="dis-status-indicator active">
+            <i></i>Control de envío disponible
+          </span>
+        </div>
+      </section>
+      <section
+        v-if="!loading && !active"
+        class="dis-review-notice"
+        role="status"
+      >
+        <i aria-hidden="true"></i>
+        <AppIcon name="warning" :size="26" />
+        <div>
+          <strong>Revisión no disponible</strong>
+          <p>No se pudo analizar el contenido de esta página.</p>
         </div>
       </section>
       <p v-if="state.environment === 'preview'" class="dis-preview-label">
@@ -144,3 +155,97 @@ const active = computed(
     </div>
   </main>
 </template>
+
+<style scoped>
+.dis-status-card,
+.dis-status-card.available {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  text-align: center;
+  gap: 0;
+  min-height: 0;
+  padding: 7px 18px 20px;
+  border: 1px solid #159f70;
+  border-radius: 15px;
+  background:
+    radial-gradient(ellipse at 15% 65%, #08623f, transparent 80%), #0b3027;
+}
+.dis-status-card :deep(.dis-security-core.compact) {
+  width: 190px;
+  max-width: 100%;
+  height: 115px;
+}
+.dis-status-card .dis-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 3px 11px;
+  border: 1px solid #40bc9670;
+  border-radius: 999px;
+  background: #07543e70;
+  font-size: 10px;
+  line-height: 2;
+  letter-spacing: 1.6px;
+  color: #96cdb7;
+}
+.dis-status-card .dis-eyebrow i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #c5ad71;
+}
+.dis-status-card.available .dis-eyebrow i {
+  background: #10b981;
+  box-shadow: 0 0 10px #10b98155;
+}
+.dis-status-card > div:last-child {
+  min-width: 0;
+}
+.dis-status-card h1 {
+  font-family: "Manrope Variable", sans-serif;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  overflow-wrap: break-word;
+  margin: 13px 0 8px;
+}
+.dis-status-card p {
+  color: #b3c9d6;
+  font-size: 14px;
+  line-height: 1.45;
+  max-width: 280px;
+  margin-inline: auto;
+}
+.dis-review-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 11px;
+  padding: 15px 19px;
+  border: 1px solid #ffe0b6;
+  border-radius: 13px;
+  background: #fff6e9;
+  color: #aa5400;
+}
+.dis-review-notice > i {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #ffcc80;
+}
+.dis-review-notice strong {
+  font-size: 13px;
+  font-weight: 800;
+}
+.dis-review-notice p {
+  margin: 2px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #596257;
+}
+</style>
